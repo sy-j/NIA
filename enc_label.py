@@ -6,8 +6,7 @@ def generate_enc_label(target_genome_id):
 
     plant_name, genome_name = get_name(target_genome_id)
 
-    if not file_check(set1t
-    ings, genome_name):
+    if not file_check(settings, genome_name):
         return 0
 
     print('Generate ENC label :', genome_name, '- %d' % target_genome_id)
