@@ -188,7 +188,4 @@ if __name__ == '__main__':
     t = time.time()
     work = GenerateEEPPData(target_genome_id)
     work.generate_and_save_data()
-    # work.load_data()
-    # work.split_train_val_test([8, 1, 1])
-    # work.save_file()
     del work
