@@ -2,13 +2,25 @@ import os
 import pandas as pd
 import json
 import tqdm
-
+import time
 
 # root = 'C:\\Users\\infoboss\\Desktop\\NIA_datafactory\\Gene'
 # root = 'I:\\2022 프로젝트\\2022_NIA_AI학습용데이터\\데이터'
 root = r'C:\Users\infoboss\Desktop\NIA\학습용 데이터'
 # status_table = 'C:\\Users\\infoboss\\Desktop\\NIA_datafactory\\Gene\\' + 'Genome_data_total_status.csv'
 status_table = os.path.join(root, 'Genome_data_total_status.csv')
+
+maxlen = {
+    'promoter': 1000,
+    'terminator': 1000,
+    'utr5': 2000,
+    'utr3': 2000,
+    'cds': 5000,
+}
+
+nucleotide_seq_cols = ['promoter', 'terminator', 'utr5', 'utr3', 'cds']
+sEEPP_input_files = ['cds', 'promoter', 'terminator', 'utr5', 'utr3', 'codon_usage']
+organs = ['leaf', 'root', 'stem', 'bud', 'flower']
 
 
 def find_file_path(gid, set='raw'):  # 이하 모든 genome_name 은 최종적으로 plant_name 으로 통일되어야함
@@ -59,15 +71,19 @@ class FilePathFinder:
     def save_path(self, set):
         if self.model == 'sEEPP':
             dict = {
-                'data_folder': os.path.join(root, '미분할 데이터', set, 'data', 'sEEPP'),
-                'label_folder': os.path.join(root, '미분할 데이터', set, 'label', 'sEEPP'),
+                'data_folder': os.path.join(root, '미분할 데이터', set, 'data', 'sEEPP', self.genome_name),
+                'label_folder': os.path.join(root, '미분할 데이터', set, 'label', 'sEEPP', self.genome_name),
                 'cds': os.path.join(root, '미분할 데이터', set, 'data', 'sEEPP', self.genome_name, 'cds.csv'),
                 'promoter': os.path.join(root, '미분할 데이터', set, 'data', 'sEEPP', self.genome_name, 'promoter.csv'),
                 'terminator': os.path.join(root, '미분할 데이터', set, 'data', 'sEEPP', self.genome_name, 'terminator.csv'),
                 'utr5': os.path.join(root, '미분할 데이터', set, 'data', 'sEEPP', self.genome_name, 'utr5.csv'),
                 'utr3': os.path.join(root, '미분할 데이터', set, 'data', 'sEEPP', self.genome_name, 'utr3.csv'),
                 'codon_usage': os.path.join(root, '미분할 데이터', set, 'data', 'sEEPP', self.genome_name, 'codon_usage.csv'),
-                'label': os.path.join(root, '미분할 데이터', set, 'label', 'sEEPP', self.genome_name)
+                'leaf': os.path.join(root, '미분할 데이터', set, 'label', 'sEEPP', self.genome_name, f'{self.plant_name}_leaf.json'),
+                'root': os.path.join(root, '미분할 데이터', set, 'label', 'sEEPP', self.genome_name, f'{self.plant_name}_root.json'),
+                'stem': os.path.join(root, '미분할 데이터', set, 'label', 'sEEPP', self.genome_name, f'{self.plant_name}_stem.json'),
+                'bud': os.path.join(root, '미분할 데이터', set, 'label', 'sEEPP', self.genome_name, f'{self.plant_name}_bud.json'),
+                'flower': os.path.join(root, '미분할 데이터', set, 'label', 'sEEPP', self.genome_name, f'{self.plant_name}_flower.json')
             }
         if self.model == 'ENC':
             dict = {

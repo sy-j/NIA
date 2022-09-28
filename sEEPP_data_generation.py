@@ -3,7 +3,6 @@ import numpy as np
 from skmultilearn.model_selection import iterative_train_test_split
 from sklearn.model_selection import train_test_split
 from sklearn.utils import check_random_state
-import time
 
 import gc
 
@@ -30,30 +29,58 @@ class GenerateEEPPData(FilePathFinder):
         self.label_cols = []
 
     def load_data(self):
-        print('loading data... ', end='')
+        print('loading data... ')
         t = time.time()
         data_df = pd.read_csv(self.read_path['data'])
         data_df['PK'] = data_df['PK'].map(lambda x: x[2:-1])
         data_df.rename(columns={'PK': 'gene_id'}, inplace=True)
-        self.data_df = data_df[data_df.columns[:71]]
-        self.codon_cols = data_df.columns[7:71]
+
+        print('checking error... ', end='')
+        drop_idx = []
+        for i in range(len(data_df)):
+            seq = data_df.iloc[i]
+            for col in nucleotide_seq_cols:
+                if str(seq[col]) == 'nan':
+                    continue
+                elif len(set(seq[col]) - set('ATGCN')) > 0:
+                    # print(set(seq[col]) - set('ATGCN'))
+                    drop_idx.append(i)
+                    break
+        data_df = data_df.drop(drop_idx)
+        print(f"{len(drop_idx)} rows removed, {len(data_df)} left")
+
+        for col in ['cds', 'terminator', 'utr3']:
+            data_df[col] = data_df[col].map(
+                lambda x: 'N'*maxlen[col] if type(x) != str
+                else (x[:maxlen[col]] if len(x) < maxlen[col] else x+'N'*(maxlen[col]-len(x))))
+        for col in ['promoter', 'utr5']:
+            data_df[col] = data_df[col].map(
+                lambda x: 'N'*maxlen[col] if type(x) != str
+                else (x[-maxlen[col]:] if len(x) < maxlen[col] else 'N'*(maxlen[col]-len(x))+x))
+        print('sequence padding & cropping...')
+
+        data_cols = data_df.columns
 
         label_df = pd.read_csv(self.read_path['label'])
         label_df.dropna(axis=1, how='all', inplace=True)
         label_df['gene_id'] = label_df['gene_id'].map(lambda x: x[2:-1])
+
+        label_cols = label_df.columns
+
+        total = pd.merge(data_df, label_df, left_on='gene_id', right_on='gene_id', how='inner')
+        data_df = total[data_cols]
+        label_df = total[label_cols]
+
+        self.data_df = data_df[data_df.columns]
+        self.codon_cols = data_df.columns[7:71]
         self.label_df = label_df
         self.label_cols = list(label_df.columns)
         del data_df, label_df
         print('time spent: %.2f(s)' % (time.time()-t))
 
     def split_train_val_test(self, ratio):
-        print('splitting data... ', end='')
+        print('splitting data... ')
         t = time.time()
-        '''
-        ratio(string) : minor group ratio, split by ','
-        ex) '0.2,0.5' 8:2 로 나누고 이후 2 를 1:1로 나눔
-        self.data_dict 에 키 값으로 저장
-        '''
         valtest_ratio = sum(ratio[1:]) / sum(ratio)
         test_ratio = ratio[2] / sum(ratio[1:])
         if len(self.label_cols) == 2:
@@ -96,11 +123,12 @@ class GenerateEEPPData(FilePathFinder):
             temp_y_id = pd.DataFrame({'gene_id': test_x[:, 0]})
             temp_y_label = pd.DataFrame(test_y, columns=temp_label_cols)
             self.data_dict['test_y'] = pd.concat([temp_y_id, temp_y_label], axis=1)
+        print(f"train: {len(self.data_dict['train_x'])}, validation: {len(self.data_dict['validation_x'])}, test: {len(self.data_dict['test_x'])}")
         print('time spent: %.2f(s)' % (time.time()-t))
 
     def save_x(self, dir, df, codon_cols):
         print('inputs: ', end='')
-        for col in ['promoter', 'terminator', 'utr5', 'utr3', 'cds']:
+        for col in nucleotide_seq_cols:
             save_result(df[['gene_id', col]], dir, self.genome_name, col, 'csv')
             # print(f"process done: {self.genome_name}: {col}.csv ")
             print(col, end=' ')
