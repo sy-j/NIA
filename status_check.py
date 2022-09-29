@@ -9,7 +9,7 @@ def status_update():
     print('updating data status..')
     df = pd.read_csv(status_table)
 
-    for i in tqdm.tqdm(range(len(df))):
+    for i in range(len(df)):
         genome_name = df.genome_name.iloc[i]
         gid = df.genome_id.iloc[i]
 

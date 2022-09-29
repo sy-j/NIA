@@ -29,13 +29,13 @@ class GenerateEEPPData(FilePathFinder):
         self.label_cols = []
 
     def load_data(self):
-        print('loading data... ')
+        print('  loading data... ')
         t = time.time()
         data_df = pd.read_csv(self.read_path['data'])
         data_df['PK'] = data_df['PK'].map(lambda x: x[2:-1])
         data_df.rename(columns={'PK': 'gene_id'}, inplace=True)
 
-        print('checking error... ', end='')
+        print('    checking error... ', end='')
         drop_idx = []
         for i in range(len(data_df)):
             seq = data_df.iloc[i]
@@ -52,12 +52,12 @@ class GenerateEEPPData(FilePathFinder):
         for col in ['cds', 'terminator', 'utr3']:
             data_df[col] = data_df[col].map(
                 lambda x: 'N'*maxlen[col] if type(x) != str
-                else (x[:maxlen[col]] if len(x) < maxlen[col] else x+'N'*(maxlen[col]-len(x))))
+                else (x[:maxlen[col]] if len(x) > maxlen[col] else x+'N'*(maxlen[col]-len(x))))
         for col in ['promoter', 'utr5']:
             data_df[col] = data_df[col].map(
                 lambda x: 'N'*maxlen[col] if type(x) != str
-                else (x[-maxlen[col]:] if len(x) < maxlen[col] else 'N'*(maxlen[col]-len(x))+x))
-        print('sequence padding & cropping...')
+                else (x[-maxlen[col]:] if len(x) > maxlen[col] else 'N'*(maxlen[col]-len(x))+x))
+        print('    sequence padding & cropping...')
 
         data_cols = data_df.columns
 
@@ -76,10 +76,10 @@ class GenerateEEPPData(FilePathFinder):
         self.label_df = label_df
         self.label_cols = list(label_df.columns)
         del data_df, label_df
-        print('time spent: %.2f(s)' % (time.time()-t))
+        print('  time spent: %.2f(s)' % (time.time()-t))
 
     def split_train_val_test(self, ratio):
-        print('splitting data... ')
+        print('  splitting data... ')
         t = time.time()
         valtest_ratio = sum(ratio[1:]) / sum(ratio)
         test_ratio = ratio[2] / sum(ratio[1:])
@@ -123,13 +123,13 @@ class GenerateEEPPData(FilePathFinder):
             temp_y_id = pd.DataFrame({'gene_id': test_x[:, 0]})
             temp_y_label = pd.DataFrame(test_y, columns=temp_label_cols)
             self.data_dict['test_y'] = pd.concat([temp_y_id, temp_y_label], axis=1)
-        print(f"train: {len(self.data_dict['train_x'])}, validation: {len(self.data_dict['validation_x'])}, test: {len(self.data_dict['test_x'])}")
-        print('time spent: %.2f(s)' % (time.time()-t))
+        print(f"    train: {len(self.data_dict['train_x'])}, validation: {len(self.data_dict['validation_x'])}, test: {len(self.data_dict['test_x'])}")
+        print('  time spent: %.2f(s)' % (time.time()-t))
 
     def save_x(self, dir, df, codon_cols):
-        print('inputs: ', end='')
+        print('    inputs: ', end='')
         for col in nucleotide_seq_cols:
-            save_result(df[['gene_id', col]], dir, self.genome_name, col, 'csv')
+            save_result(df[['gene_id', col]], dir, '', col, 'csv')
             # print(f"process done: {self.genome_name}: {col}.csv ")
             print(col, end=' ')
 
@@ -149,11 +149,11 @@ class GenerateEEPPData(FilePathFinder):
             'count': temp_arr,
             'ratio': ratio
         })
-        save_result(codon_usage, dir, self.genome_name, 'codon_usage', 'csv')
+        save_result(codon_usage, dir, '', 'codon_usage', 'csv')
         print('codon_usage')
 
     def save_y(self, dir, df, label_cols):
-        print('labels: ', end='')
+        print('    labels: ', end='')
         save_cols = label_cols[1:]
         for col in save_cols:
             temp_df = df[['gene_id', col]]
@@ -171,38 +171,39 @@ class GenerateEEPPData(FilePathFinder):
                 f"data/sEEPP/{self.plant_name}/utr3.csv",
                 f"data/sEEPP/{self.plant_name}/utr5.csv"
             ]
-            seepp_label['organ_list'] = label_cols
+            seepp_label['organ_list'] = save_cols
             seepp_label['label_count'] = len(temp_df)
             seepp_label['label'] = temp_dict
             fname = f"{self.plant_name}_{col}"
-            save_result(seepp_label, dir, self.genome_name, fname, 'json')
+            save_result(seepp_label, dir, '', fname, 'json')
             print(col, end=' ')
         print('')
 
     def save_file(self):
-        print('generating train set...')
+        print('  generating train set...')
         save_path = self.save_path('train')
         t = time.time()
         self.save_x(save_path['data_folder'], self.data_dict['train_x'], self.codon_cols)
         self.save_y(save_path['label_folder'], self.data_dict['train_y'], self.label_cols)
-        print('time spent: %.2f(s)' % (time.time() - t))
+        print('  time spent: %.2f(s)' % (time.time() - t))
 
-        print('generating validation set...')
+        print('  generating validation set...')
         save_path = self.save_path('validation')
         t = time.time()
         self.save_x(save_path['data_folder'], self.data_dict['validation_x'], self.codon_cols)
         self.save_y(save_path['label_folder'], self.data_dict['validation_y'], self.label_cols)
-        print('time spent: %.2f(s)' % (time.time() - t))
+        print('  time spent: %.2f(s)' % (time.time() - t))
 
-        print('generating test set...')
+        print('  generating test set...')
         save_path = self.save_path('test')
         t = time.time()
         self.save_x(save_path['data_folder'], self.data_dict['test_x'], self.codon_cols)
         self.save_y(save_path['label_folder'], self.data_dict['test_y'], self.label_cols)
-        print('time spent: %.2f(s)' % (time.time() - t))
+        print('  time spent: %.2f(s)' % (time.time() - t))
 
     def generate_and_save_data(self):
         t = time.time()
+        print("<Generate sEEPP Data>")
         print(f"GenomeName: {self.genome_name}, GenomeID: {self.genome_id}")
         self.load_data()
         self.split_train_val_test([8, 1, 1])

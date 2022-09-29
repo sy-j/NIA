@@ -52,6 +52,7 @@ from utils import *
 
 def error_check(target_genome_id, model):
     fpf = FilePathFinder(target_genome_id, model)
+    print("<Inspect sEEPP data>")
     print(f"GenomeName: {fpf.genome_name}, GenomeID: {fpf.genome_id}")
     print('processing... ', end='')
     t = time.time()
@@ -127,7 +128,7 @@ def error_check(target_genome_id, model):
 
 
 if __name__ == '__main__':
-    gid = 14205
+    gid = 14225
     # df = pd.read_csv(status_table)
     error_check(gid, 'sEEPP')
     # df.to_csv(status_table, index=False)
