@@ -3,12 +3,16 @@ import pandas as pd
 import json
 import tqdm
 import time
+import random
+import numpy as np
 
 # root = 'C:\\Users\\infoboss\\Desktop\\NIA_datafactory\\Gene'
 # root = 'I:\\2022 프로젝트\\2022_NIA_AI학습용데이터\\데이터'
 root = r'C:\Users\infoboss\Desktop\NIA\학습용 데이터'
 # status_table = 'C:\\Users\\infoboss\\Desktop\\NIA_datafactory\\Gene\\' + 'Genome_data_total_status.csv'
 status_table = os.path.join(root, 'Genome_data_total_status.csv')
+class_ec_4digit = os.path.join(root, 'class_ec_4digit.csv')
+class_ec_3digit = os.path.join(root, 'class_ec_3digit.csv')
 
 maxlen = {
     'promoter': 1000,
@@ -16,35 +20,17 @@ maxlen = {
     'utr5': 2000,
     'utr3': 2000,
     'cds': 5000,
+    'amino_acid': 2000
 }
 
 nucleotide_seq_cols = ['promoter', 'terminator', 'utr5', 'utr3', 'cds']
 sEEPP_input_files = ['cds', 'promoter', 'terminator', 'utr5', 'utr3', 'codon_usage']
 organs = ['leaf', 'root', 'stem', 'bud', 'flower']
-
-
-def find_file_path(gid, set='raw'):  # 이하 모든 genome_name 은 최종적으로 plant_name 으로 통일되어야함
-    plant_name, genome_name = get_name(gid)
-
-    if set == 'raw':
-        dict = {
-            'genome': os.path.join(root, '전처리 이전 데이터', 'gene_input_raw', f'Merge.{gid}.csv'),
-            'RNASeq': os.path.join(root, '전처리 이전 데이터', 'sEEPP_label_raw', f'Total_{gid}.csv'),
-            'BRENDA': os.path.join(root, '전처리 이전 데이터', 'ENC_label_raw', f'{genome_name}.csv')
-        }
-    else:
-        dict = {
-            'cds': os.path.join(root, '미분할 데이터', set, 'data', 'sEEPP', genome_name, 'cds.csv'),
-            'promoter': os.path.join(root, '미분할 데이터', set, 'data', 'sEEPP', genome_name, 'promoter.csv'),
-            'terminator': os.path.join(root, '미분할 데이터', set, 'data', 'sEEPP', genome_name, 'terminator.csv'),
-            'utr5': os.path.join(root, '미분할 데이터', set, 'data', 'sEEPP', genome_name, 'utr5.csv'),
-            'utr3': os.path.join(root, '미분할 데이터', set, 'data', 'sEEPP', genome_name, 'utr3.csv'),
-            'codon_usage': os.path.join(root, '미분할 데이터', set, 'data', 'sEEPP', genome_name, 'codon_usage.csv'),
-            'amino_acid': os.path.join(root, '미분할 데이터', set, 'data', 'ENC', genome_name, 'amino_acid.csv'),
-            'sEEPP_label': os.path.join(root, '미분할 데이터', set, 'label', 'sEEPP', genome_name),
-            'ENC_label': os.path.join(root, '미분할 데이터', set, 'label', 'ENC', genome_name, f'{plant_name}.json')
-        }
-    return dict
+raw_data_path = {
+    'genome': os.path.join(root, '전처리 이전 데이터', 'gene_input_raw'),
+    'RNASeq': os.path.join(root, '전처리 이전 데이터', 'sEEPP_label_raw'),
+    'BRENDA': os.path.join(root, '전처리 이전 데이터', 'ENC_label_raw')
+}
 
 
 class FilePathFinder:
@@ -87,12 +73,17 @@ class FilePathFinder:
             }
         if self.model == 'ENC':
             dict = {
-                'data_folder': os.path.join(root, '미분할 데이터', set, 'data', 'ENC'),
-                'label_folder': os.path.join(root, '미분할 데이터', set, 'label', 'ENC'),
-                'amino_acid': os.path.join(root, '미분할 데이터', set, 'data', 'ENC', genome_name, 'amino_acid.csv'),
-                'label': os.path.join(root, '미분할 데이터', set, 'label', 'ENC', genome_name, f'{plant_name}.json')
+                'data_folder': os.path.join(root, '미분할 데이터', set, 'data', 'ENC', self.genome_name),
+                'label_folder': os.path.join(root, '미분할 데이터', set, 'label', 'ENC', self.genome_name),
+                'amino_acid': os.path.join(root, '미분할 데이터', set, 'data', 'ENC', self.genome_name, 'amino_acid.csv'),
+                'label': os.path.join(root, '미분할 데이터', set, 'label', 'ENC', self.genome_name, f'{self.plant_name}.json')
             }
         return dict
+
+
+def set_seed(seed=911):
+    random.seed(seed)
+    np.random.seed(seed)
 
 
 # 경로 생성
@@ -169,3 +160,35 @@ def data_count(model, name):
             tmp = json.load(tmp)
             label_cnt += len(tmp['label'])
     return input_cnt, label_cnt
+
+
+def define_total_ec():
+    file_list = os.listdir(raw_data_path['BRENDA'])
+    ec = []
+    for file in tqdm.tqdm(file_list):
+        df = pd.read_csv(os.path.join(raw_data_path['BRENDA'], file))
+        ec += list(df['EC Number'].unique())
+
+    ec = list(set(ec))
+    unique_ec_4d = []
+    for item in tqdm.tqdm(ec):
+        if item.count('.') == 3 and item.count('B') == 0 and item not in unique_ec_4d:
+            unique_ec_4d.append(item)
+    unique_ec_4d.sort()
+    ec_4d = pd.DataFrame(unique_ec_4d)
+    ec_4d.columns = ['EC_number_4d']
+    ec_4d.to_csv(class_ec_4digit, index=False)
+
+    unique_ec_3d = []
+    for item in tqdm.tqdm(unique_ec_4d):
+        tmp = '.'.join(item.split('.')[:-1])
+        if tmp not in unique_ec_3d:
+            unique_ec_3d.append(tmp)
+    unique_ec_3d.sort()
+    ec_3d = pd.DataFrame(unique_ec_3d)
+    ec_3d.columns = ['EC_number_3d']
+    ec_3d.to_csv(class_ec_3digit, index=False)
+
+
+# if __name__ == '__main__':
+#     define_total_ec()
