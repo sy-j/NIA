@@ -1,20 +1,11 @@
-import random
-import numpy as np
 from skmultilearn.model_selection import iterative_train_test_split
 from sklearn.model_selection import train_test_split
-from sklearn.utils import check_random_state
 
 import gc
 
 from utils import *
 
 pd.set_option('mode.chained_assignment', None)  # settingwithcopywarning 무시
-
-
-def set_seed(seed=911):
-    random.seed(seed)
-    np.random.seed(seed)
-    check_random_state(seed)
 
 
 class GenerateEEPPData(FilePathFinder):
