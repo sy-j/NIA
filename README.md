@@ -2,7 +2,7 @@
 인공지능 학습용 데이터 총괄 관리 파이프라인
 
 
-### 현황 220928
+### 현황 221005
 #### Done
 - 염기서열 전처리 기능 (ATGCN 제외 서열 제거) 추가 완료
 - 특정 gene_id에 대해 train, validation, test set의 data, label 일괄 생성 기능 & 일괄 검수 기능 (sEEPP) 추가 완료
