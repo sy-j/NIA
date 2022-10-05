@@ -6,10 +6,7 @@ import time
 import random
 import numpy as np
 
-# root = 'C:\\Users\\infoboss\\Desktop\\NIA_datafactory\\Gene'
-# root = 'I:\\2022 프로젝트\\2022_NIA_AI학습용데이터\\데이터'
 root = r'C:\Users\infoboss\Desktop\NIA\학습용 데이터'
-# status_table = 'C:\\Users\\infoboss\\Desktop\\NIA_datafactory\\Gene\\' + 'Genome_data_total_status.csv'
 status_table = os.path.join(root, 'Genome_data_total_status.csv')
 class_ec_4digit = os.path.join(root, 'class_ec_4digit.csv')
 class_ec_3digit = os.path.join(root, 'class_ec_3digit.csv')
@@ -33,6 +30,7 @@ raw_data_path = {
 }
 
 
+# genome_id, 모델명에 대한 모든 파일경로 관리
 class FilePathFinder:
     def __init__(self, target_genome_id, model):
         self.genome_id = target_genome_id
@@ -81,6 +79,7 @@ class FilePathFinder:
         return dict
 
 
+# random seed 설정
 def set_seed(seed=911):
     random.seed(seed)
     np.random.seed(seed)
@@ -117,14 +116,7 @@ def get_name(target_genome_id):
     return plant_name, genome_name
 
 
-# 파일 명명 규칙에 맞춰 결과 저장
-# def save_result(data, settings, name, fname, ftype):
-#     dir = os.path.join(root, settings['type'], settings['model'], name, fname+'.'+ftype)
-#     if ftype == 'csv':
-#         data.to_csv(dir, index=False)
-#     if ftype == 'json':
-#         with open(dir, 'w') as f:
-#             json.dump(data, f, ensure_ascii=False, indent=4)
+# 파일 저장
 def save_result(data, root_name, folder_name, file_name, file_type):
     dir = os.path.join(root_name, folder_name)
     create_folder(dir)
@@ -162,6 +154,7 @@ def data_count(model, name):
     return input_cnt, label_cnt
 
 
+# 전체 EC number 확인 (1~3자리까지만 나온 것, B 포함된 것 제외)
 def define_total_ec():
     file_list = os.listdir(raw_data_path['BRENDA'])
     ec = []
