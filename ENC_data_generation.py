@@ -172,7 +172,7 @@ def train_test_split_advanced(data, test_size):
 
 if __name__ == '__main__':
     set_seed()
-    target_genome_id = 14205
+    target_genome_id = 14225
     t = time.time()
     work = GenerateENCData(target_genome_id)
     work.generate_and_save_data()
