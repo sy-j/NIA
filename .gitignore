@@ -4,6 +4,7 @@ seepp_input.py
 seepp_label.py
 enc_input.py
 enc_label.py
+enc_data_count.py
 test.py
 venv/
 __pycache__/
