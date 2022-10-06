@@ -159,7 +159,7 @@ class GenerateEEPPData(FilePathFinder):
     # label 저장
     def save_y(self, dir, df, label_cols):
         print('    labels: ', end='')
-        save_cols = label_cols[1:]
+        save_cols = list(label_cols[1:])
         for col in save_cols:
             temp_df = df[['gene_id', col]]
             temp_df.loc[:, 'organ'] = [col] * len(df)

@@ -1,5 +1,10 @@
 BRENDA_history_crawler.py
 BRENDA_scarp_downloader.py
+seepp_input.py
+seepp_label.py
+enc_input.py
+enc_label.py
+test.py
 venv/
 __pycache__/
 .idea/

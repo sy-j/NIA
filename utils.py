@@ -116,6 +116,12 @@ def get_name(target_genome_id):
     return plant_name, genome_name
 
 
+# def type_convert(o):
+#     if isinstance(o, np.int64):
+#         return int(o)
+#     raise TypeError
+
+
 # 파일 저장
 def save_result(data, root_name, folder_name, file_name, file_type):
     dir = os.path.join(root_name, folder_name)
