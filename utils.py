@@ -10,7 +10,8 @@ root = r'C:\Users\infoboss\Desktop\NIA\학습용 데이터'
 status_table = os.path.join(root, 'Genome_data_total_status.csv')
 class_ec_4digit = os.path.join(root, 'class_ec_4digit.csv')
 class_ec_3digit = os.path.join(root, 'class_ec_3digit.csv')
-
+enc_score_threshold = 100
+enc_max_score = 400
 maxlen = {
     'promoter': 1000,
     'terminator': 1000,

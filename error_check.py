@@ -101,13 +101,13 @@ def ENC_error_check(target_genome_id):
             with open(path['label'], 'r') as tmp:
                 tmp = json.load(tmp)
                 label = tmp['label']
-                if tmp['label_count'] != len(tmp['label']):
+                if tmp['label_count'] != len(label):
                     print(f"Error in file {os.path.basename(path['label'])}\n"
-                          f"[WrongLabelCount] label_count is {tmp['label_count']}, but actually has {len(tmp['label'])} labels")
+                          f"[WrongLabelCount] label_count is {tmp['label_count']}, but actually has {len(label)} labels")
                     return 'WrongLabelCount'
                 if tmp['label_count'] != data_len:
                     print(f"Error in file {os.path.basename(path['label'])}\n"
-                          f"[InconsistentLabelCount] label_count is {tmp['label_count']}, but actually has {len(tmp['label'])} labels")
+                          f"[InconsistentLabelCount] label_count is {tmp['label_count']}, but actually has {len(label)} labels")
                     return 'InconsistentLabelCount'
         else:
             print(f"Error in folder {os.path.basename(path['label_folder'])}\n"
@@ -115,11 +115,16 @@ def ENC_error_check(target_genome_id):
             return 'LabelFileNotExists'
 
         # gene_id 전부 동일한지 체크
+        # score 값 유효범위 이내인지 체크
         for i in range(data_len):
             if data['gene_id'].iloc[i] != int(label[i]['gene_id']):
                 print(f"Error in file {os.path.basename(path['amino_acid'])}, {os.path.basename(path['label'])}\n"
                       f"[GeneIDMismatch] different gene_id in in row {i}: {data['gene_id'].iloc[i]} and {label['gene_id']}")
                 return 'GeneIDMismatch'
+            if 0 < float(label[i]['score']) < enc_score_threshold or float(label[i]['score']) > enc_max_score:
+                print(f"Error in file {os.path.basename(path['label'])}\n"
+                      f"[ScoreOutOfRange] score out of range in row {i}: {label[i]['score']}")
+                return 'ScoreOutOfRange'
 
         print("no error found, time spent: %2f(s)" % (time.time()-t))
         return 0

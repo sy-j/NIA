@@ -36,7 +36,7 @@ for i in range(len(df)):
                 df.loc[i, 'ENC dataset generation'] = 1
             if df['ENC dataset generation'].iloc[i] == 1 and df['ENC error'].iloc[i] != '0':
                 df.loc[i, 'ENC error'] = error_check.ENC_error_check(df['genome_id'].iloc[i])
-            if df['ENC dataset generation'].iloc[i] == 1 and int(df['ENC error'].iloc[i]) == 0:
+            if df['ENC dataset generation'].iloc[i] == 1 and df['ENC error'].iloc[i] == 0:
                 df.loc[i, 'ENC dataset available'] = 1
     df.to_csv(status_table, index=False)
 
