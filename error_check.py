@@ -1,3 +1,6 @@
+import pandas as pd
+
+import status_check
 from utils import *
 
 
@@ -130,9 +133,19 @@ def ENC_error_check(target_genome_id):
         return 0
 
 
+def check_all_data():
+    status_check.status_update()
+    df = pd.read_csv(status_table)
+    print('Inspect all data...')
+    t = time.time()
+    for i in range(len(df)):
+        if df['sEEPP dataset available'].iloc[i] == 1:
+            sEEPP_error_check(df['genome_id'].iloc[i])
+        if df['ENC dataset available'].iloc[i] == 1:
+            ENC_error_check(df['genome_id'].iloc[i])
+    print("all process done, total time spent: %2f(s)" % (time.time() - t))
+
+
 if __name__ == '__main__':
     gid = 14225
-    # df = pd.read_csv(status_table)
-    # sEEPP_error_check(gid)
     ENC_error_check(gid)
-    # df.to_csv(status_table, index=False)

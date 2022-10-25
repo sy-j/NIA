@@ -56,26 +56,26 @@ class FilePathFinder:
     def save_path(self, set):
         if self.model == 'sEEPP':
             dict = {
-                'data_folder': os.path.join(root, '미분할 데이터', set, 'data', 'sEEPP', self.genome_name),
-                'label_folder': os.path.join(root, '미분할 데이터', set, 'label', 'sEEPP', self.genome_name),
-                'cds': os.path.join(root, '미분할 데이터', set, 'data', 'sEEPP', self.genome_name, 'cds.csv'),
-                'promoter': os.path.join(root, '미분할 데이터', set, 'data', 'sEEPP', self.genome_name, 'promoter.csv'),
-                'terminator': os.path.join(root, '미분할 데이터', set, 'data', 'sEEPP', self.genome_name, 'terminator.csv'),
-                'utr5': os.path.join(root, '미분할 데이터', set, 'data', 'sEEPP', self.genome_name, 'utr5.csv'),
-                'utr3': os.path.join(root, '미분할 데이터', set, 'data', 'sEEPP', self.genome_name, 'utr3.csv'),
-                'codon_usage': os.path.join(root, '미분할 데이터', set, 'data', 'sEEPP', self.genome_name, 'codon_usage.csv'),
-                'leaf': os.path.join(root, '미분할 데이터', set, 'label', 'sEEPP', self.genome_name, f'{self.plant_name}_leaf.json'),
-                'root': os.path.join(root, '미분할 데이터', set, 'label', 'sEEPP', self.genome_name, f'{self.plant_name}_root.json'),
-                'stem': os.path.join(root, '미분할 데이터', set, 'label', 'sEEPP', self.genome_name, f'{self.plant_name}_stem.json'),
-                'bud': os.path.join(root, '미분할 데이터', set, 'label', 'sEEPP', self.genome_name, f'{self.plant_name}_bud.json'),
-                'flower': os.path.join(root, '미분할 데이터', set, 'label', 'sEEPP', self.genome_name, f'{self.plant_name}_flower.json')
+                'data_folder': os.path.join(root, '제출용 데이터', set, 'data', 'sEEPP', self.genome_name),
+                'label_folder': os.path.join(root, '제출용 데이터', set, 'label', 'sEEPP', self.genome_name),
+                'cds': os.path.join(root, '제출용 데이터', set, 'data', 'sEEPP', self.genome_name, 'cds.csv'),
+                'promoter': os.path.join(root, '제출용 데이터', set, 'data', 'sEEPP', self.genome_name, 'promoter.csv'),
+                'terminator': os.path.join(root, '제출용 데이터', set, 'data', 'sEEPP', self.genome_name, 'terminator.csv'),
+                'utr5': os.path.join(root, '제출용 데이터', set, 'data', 'sEEPP', self.genome_name, 'utr5.csv'),
+                'utr3': os.path.join(root, '제출용 데이터', set, 'data', 'sEEPP', self.genome_name, 'utr3.csv'),
+                'codon_usage': os.path.join(root, '제출용 데이터', set, 'data', 'sEEPP', self.genome_name, 'codon_usage.csv'),
+                'leaf': os.path.join(root, '제출용 데이터', set, 'label', 'sEEPP', self.genome_name, f'{self.plant_name}_leaf.json'),
+                'root': os.path.join(root, '제출용 데이터', set, 'label', 'sEEPP', self.genome_name, f'{self.plant_name}_root.json'),
+                'stem': os.path.join(root, '제출용 데이터', set, 'label', 'sEEPP', self.genome_name, f'{self.plant_name}_stem.json'),
+                'bud': os.path.join(root, '제출용 데이터', set, 'label', 'sEEPP', self.genome_name, f'{self.plant_name}_bud.json'),
+                'flower': os.path.join(root, '제출용 데이터', set, 'label', 'sEEPP', self.genome_name, f'{self.plant_name}_flower.json')
             }
         if self.model == 'ENC':
             dict = {
-                'data_folder': os.path.join(root, '미분할 데이터', set, 'data', 'ENC', self.genome_name),
-                'label_folder': os.path.join(root, '미분할 데이터', set, 'label', 'ENC', self.genome_name),
-                'amino_acid': os.path.join(root, '미분할 데이터', set, 'data', 'ENC', self.genome_name, 'amino_acid.csv'),
-                'label': os.path.join(root, '미분할 데이터', set, 'label', 'ENC', self.genome_name, f'{self.plant_name}.json')
+                'data_folder': os.path.join(root, '제출용 데이터', set, 'data', 'ENC', self.genome_name),
+                'label_folder': os.path.join(root, '제출용 데이터', set, 'label', 'ENC', self.genome_name),
+                'amino_acid': os.path.join(root, '제출용 데이터', set, 'data', 'ENC', self.genome_name, 'amino_acid.csv'),
+                'label': os.path.join(root, '제출용 데이터', set, 'label', 'ENC', self.genome_name, f'{self.plant_name}.json')
             }
         return dict
 
