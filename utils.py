@@ -6,7 +6,7 @@ import time
 import random
 import numpy as np
 
-root = r'C:\Users\infoboss\Desktop\NIA\학습용 데이터'
+root = r'D:\NIA\학습용 데이터'
 status_table = os.path.join(root, 'Genome_data_total_status.csv')
 class_ec_4digit = os.path.join(root, 'class_ec_4digit.csv')
 class_ec_3digit = os.path.join(root, 'class_ec_3digit.csv')
@@ -53,29 +53,29 @@ class FilePathFinder:
             }
         return dict
 
-    def save_path(self, set):
+    def save_path(self, set, purpose='제출용 데이터'):
         if self.model == 'sEEPP':
             dict = {
-                'data_folder': os.path.join(root, '제출용 데이터', set, 'data', 'sEEPP', self.genome_name),
-                'label_folder': os.path.join(root, '제출용 데이터', set, 'label', 'sEEPP', self.genome_name),
-                'cds': os.path.join(root, '제출용 데이터', set, 'data', 'sEEPP', self.genome_name, 'cds.csv'),
-                'promoter': os.path.join(root, '제출용 데이터', set, 'data', 'sEEPP', self.genome_name, 'promoter.csv'),
-                'terminator': os.path.join(root, '제출용 데이터', set, 'data', 'sEEPP', self.genome_name, 'terminator.csv'),
-                'utr5': os.path.join(root, '제출용 데이터', set, 'data', 'sEEPP', self.genome_name, 'utr5.csv'),
-                'utr3': os.path.join(root, '제출용 데이터', set, 'data', 'sEEPP', self.genome_name, 'utr3.csv'),
-                'codon_usage': os.path.join(root, '제출용 데이터', set, 'data', 'sEEPP', self.genome_name, 'codon_usage.csv'),
-                'leaf': os.path.join(root, '제출용 데이터', set, 'label', 'sEEPP', self.genome_name, f'{self.plant_name}_leaf.json'),
-                'root': os.path.join(root, '제출용 데이터', set, 'label', 'sEEPP', self.genome_name, f'{self.plant_name}_root.json'),
-                'stem': os.path.join(root, '제출용 데이터', set, 'label', 'sEEPP', self.genome_name, f'{self.plant_name}_stem.json'),
-                'bud': os.path.join(root, '제출용 데이터', set, 'label', 'sEEPP', self.genome_name, f'{self.plant_name}_bud.json'),
-                'flower': os.path.join(root, '제출용 데이터', set, 'label', 'sEEPP', self.genome_name, f'{self.plant_name}_flower.json')
+                'data_folder': os.path.join(root, purpose, set, 'data', 'sEEPP', self.genome_name),
+                'label_folder': os.path.join(root, purpose, set, 'label', 'sEEPP', self.genome_name),
+                'cds': os.path.join(root, purpose, set, 'data', 'sEEPP', self.genome_name, 'cds.csv'),
+                'promoter': os.path.join(root, purpose, set, 'data', 'sEEPP', self.genome_name, 'promoter.csv'),
+                'terminator': os.path.join(root, purpose, set, 'data', 'sEEPP', self.genome_name, 'terminator.csv'),
+                'utr5': os.path.join(root, purpose, set, 'data', 'sEEPP', self.genome_name, 'utr5.csv'),
+                'utr3': os.path.join(root, purpose, set, 'data', 'sEEPP', self.genome_name, 'utr3.csv'),
+                'codon_usage': os.path.join(root, purpose, set, 'data', 'sEEPP', self.genome_name, 'codon_usage.csv'),
+                'leaf': os.path.join(root, purpose, set, 'label', 'sEEPP', self.genome_name, f'{self.plant_name}_leaf.json'),
+                'root': os.path.join(root, purpose, set, 'label', 'sEEPP', self.genome_name, f'{self.plant_name}_root.json'),
+                'stem': os.path.join(root, purpose, set, 'label', 'sEEPP', self.genome_name, f'{self.plant_name}_stem.json'),
+                'bud': os.path.join(root, purpose, set, 'label', 'sEEPP', self.genome_name, f'{self.plant_name}_bud.json'),
+                'flower': os.path.join(root, purpose, set, 'label', 'sEEPP', self.genome_name, f'{self.plant_name}_flower.json')
             }
         if self.model == 'ENC':
             dict = {
-                'data_folder': os.path.join(root, '제출용 데이터', set, 'data', 'ENC', self.genome_name),
-                'label_folder': os.path.join(root, '제출용 데이터', set, 'label', 'ENC', self.genome_name),
-                'amino_acid': os.path.join(root, '제출용 데이터', set, 'data', 'ENC', self.genome_name, 'amino_acid.csv'),
-                'label': os.path.join(root, '제출용 데이터', set, 'label', 'ENC', self.genome_name, f'{self.plant_name}.json')
+                'data_folder': os.path.join(root, purpose, set, 'data', 'ENC', self.genome_name),
+                'label_folder': os.path.join(root, purpose, set, 'label', 'ENC', self.genome_name),
+                'amino_acid': os.path.join(root, purpose, set, 'data', 'ENC', self.genome_name, 'amino_acid.csv'),
+                'label': os.path.join(root, purpose, set, 'label', 'ENC', self.genome_name, f'{self.plant_name}.json')
             }
         return dict
 
@@ -163,10 +163,11 @@ def data_count(model, name):
 
 # 전체 EC number 확인 (1~3자리까지만 나온 것, B 포함된 것 제외)
 def define_total_ec():
-    file_list = os.listdir(raw_data_path['BRENDA'])
+    file_list = os.listdir(raw_data_path['BRENDA'])[:-1]
     ec = []
     for file in tqdm.tqdm(file_list):
         df = pd.read_csv(os.path.join(raw_data_path['BRENDA'], file))
+        df = df[df['Score'] >= enc_score_threshold]
         ec += list(df['EC Number'].unique())
 
     ec = list(set(ec))
@@ -190,5 +191,5 @@ def define_total_ec():
     ec_3d.to_csv(class_ec_3digit, index=False)
 
 
-# if __name__ == '__main__':
-#     define_total_ec()
+if __name__ == '__main__':
+    define_total_ec()

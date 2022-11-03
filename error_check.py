@@ -147,5 +147,6 @@ def check_all_data():
 
 
 if __name__ == '__main__':
-    gid = 14225
-    ENC_error_check(gid)
+    # gid = 14225
+    # ENC_error_check(gid)
+    check_all_data()
