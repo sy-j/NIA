@@ -60,11 +60,14 @@ class GenerateENCData(FilePathFinder):
         label_df['Protein name'] = label_df['Protein name'].map(lambda x: x[2:-1])
         label_df.rename(columns={'Protein name': 'gene_id'}, inplace=True)
 
-        # 클래스로 정의되지 않는 데이터 제거 (1~3자리 EC, 또는 B 포함하는 EC)
+        # 클래스로 정의되지 않는 데이터 제거 (1~3자리 EC, 또는 B 포함하는 EC)\
+        # score 기준치 이하 데이터 제거 (non enzyme 으로 취급)
         print('    checking label error... ', end='')
         drop_idx = []
         for i in range(len(label_df)):
             if label_df['EC Number'].iloc[i] not in self.all_ec_4d:
+                drop_idx.append(i)
+            elif label_df['Score'].iloc[i] < enc_score_threshold:
                 drop_idx.append(i)
         label_df = label_df.drop(drop_idx)
 
@@ -115,7 +118,8 @@ class GenerateENCData(FilePathFinder):
         df['ec_subclass'] = df['EC Number'].map(lambda x: int(x[3:].split('.')[1]))
         df['ec_subsubclass'] = df['EC Number'].map(lambda x: int(x[3:].split('.')[2]))
         df['ec_serial'] = df['EC Number'].map(lambda x: int(x[3:].split('.')[3]))
-        df.rename(columns={'Score': 'score'}, inplace=True)
+        df['score'] = df['Score'].map(lambda x: enc_max_score if x > enc_max_score else x)
+        # df.rename(columns={'Score': 'score'}, inplace=True)
         label = df[self.label_cols]
         label = label.sort_values(by=['gene_id'], ascending=True)
 
